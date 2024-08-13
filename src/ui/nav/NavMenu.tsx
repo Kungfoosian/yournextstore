@@ -136,9 +136,9 @@ const NavigationMenuTriggerWithFixedUX = ({
 			onClick={(e) => {
 				// the menu should open on click on touch screens
 				// in some browsers onClick can be triggered by PointerEvent
-				if (e.nativeEvent instanceof PointerEvent && e.nativeEvent.pointerType !== "mouse") {
-					return;
-				}
+				// if (e.nativeEvent instanceof PointerEvent && e.nativeEvent.pointerType !== "mouse") {
+				// 	return;
+				// }
 				// prevent the default behavior for mouse users
 				e.preventDefault();
 			}}
