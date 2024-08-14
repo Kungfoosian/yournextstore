@@ -11,3 +11,4 @@ SECURITY*
 !.next/static
 !.next/standalone
 .git
+.github
