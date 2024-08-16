@@ -15,11 +15,11 @@ ENV NEXT_PUBLIC_URL $NEXT_PUBLIC_URL
 ARG STRIPE_CURRENCY
 ENV STRIPE_CURRENCY $STRIPE_CURRENCY
 
-RUN apk add --no-cache libc6-compat
 
 COPY package.json pnpm-lock.yaml* ./
 
-RUN corepack enable pnpm \
+RUN apk add --no-cache libc6-compat && \
+    corepack enable pnpm \
     && pnpm install --frozen-lockfile
         
 
@@ -37,14 +37,12 @@ ENV NEXT_PUBLIC_URL $NEXT_PUBLIC_URL
 ARG STRIPE_CURRENCY
 ENV STRIPE_CURRENCY $STRIPE_CURRENCY
 
-
 # copies  the rest of the code, ignoring the ones listed in .dockerignore
 COPY . .
-#  finally, build the source code into an application, which will store into the .next  folder  in  same location
-RUN pnpm run build
 
-# removing things that won't need to be in final build
-RUN rm -rf src/ \
+# build app, then removing things that won't need to be in final build
+RUN pnpm run build && \
+    rm -rf src/ \
            yns.inlang/ \
            vitest.config.ts \
            tsconfig.json \
@@ -62,21 +60,32 @@ RUN rm -rf src/ \
            mdx-components.tsx \
            .eslintrc.json \
            .npmrc \
-           .prettierignore
+           .prettierignore && \
+    pnpm prune --prod
 
-# production image - working, but size too big?
-FROM builder AS runner
+
+
+FROM base AS runner
 WORKDIR /app
+
+COPY package.json pnpm-lock.yaml* ./
+
+RUN apk add --no-cache libc6-compat && \
+    corepack enable pnpm
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Switch to non-root user
-RUN adduser -D yournextstore
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ENV ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY $NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ARG STRIPE_SECRET_KEY
+ENV STRIPE_SECRET_KEY $STRIPE_SECRET_KEY
+ARG NEXT_PUBLIC_URL
+ENV NEXT_PUBLIC_URL $NEXT_PUBLIC_URL
+ARG STRIPE_CURRENCY
+ENV STRIPE_CURRENCY $STRIPE_CURRENCY
 
-RUN chown -R yournextstore ./.next
-
-USER yournextstore
+COPY --from=builder /app/ .
 
 EXPOSE 3000
 
