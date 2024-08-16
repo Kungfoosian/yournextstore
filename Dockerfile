@@ -43,11 +43,9 @@ COPY . .
 #  finally, build the source code into an application, which will store into the .next  folder  in  same location
 RUN pnpm run build
 
-# removes the src folder bc it was needed to build app
-RUN rm -rf src/
-
-# removing things that might not need to be in final build
-RUN rm -rf yns.inlang/ \
+# removing things that won't need to be in final build
+RUN rm -rf src/ \
+           yns.inlang/ \
            vitest.config.ts \
            tsconfig.json \
            tailwind.config.ts \
@@ -76,7 +74,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Switch to non-root user
 RUN adduser -D yournextstore
 
-RUN chown -R yournextstore /app
+RUN chown -R yournextstore ./.next
 
 USER yournextstore
 
