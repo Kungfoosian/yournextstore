@@ -44,11 +44,27 @@ COPY . .
 RUN pnpm run build
 
 # removes the src folder bc it was needed to build app
-RUN rm -rf ./src
+RUN rm -rf src/
 
 # removing things that might not need to be in final build
-RUN rm -rf yns.inlang/ vitest.config.ts tsconfig.json tailwind.config.ts
-
+RUN rm -rf yns.inlang/ \
+           vitest.config.ts \
+           tsconfig.json \
+           tailwind.config.ts \
+           commitlint.config.ts \
+           prettier.config.js \
+           postcss.config.cjs \
+           next-fix.d.ts \
+           next-env.d.ts \
+           i18n.d.ts \
+           .husky \
+           .lintstagedrc.js \
+           components.json \
+           global.d.ts \
+           mdx-components.tsx \
+           .eslintrc.json \
+           .npmrc \
+           .prettierignore
 
 # production image - working, but size too big?
 FROM builder AS runner
@@ -56,6 +72,13 @@ WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+
+# Switch to non-root user
+RUN adduser -D yournextstore
+
+RUN chown -R yournextstore /app
+
+USER yournextstore
 
 EXPOSE 3000
 
