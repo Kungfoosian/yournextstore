@@ -37,21 +37,20 @@ ENV NEXT_PUBLIC_URL $NEXT_PUBLIC_URL
 ARG STRIPE_CURRENCY
 ENV STRIPE_CURRENCY $STRIPE_CURRENCY
 
-#   reinstall dependencies  without devDependencies
-# RUN apk add --no-cache libc6-compat
 
-# COPY package.json pnpm-lock.yaml* ./
-
-# RUN corepack enable pnpm \
-    # && pnpm install --prod --frozen-lockfile
-
-# then copies  the rest of the code, ignoring the ones listed in .dockerignore
+# copies  the rest of the code, ignoring the ones listed in .dockerignore
 COPY . .
 #  finally, build the source code into an application, which will store into the .next  folder  in  same location
 RUN pnpm run build
 
+# removes the src folder bc it was needed to build app
+RUN rm -rf ./src
 
-# production image
+# removing things that might not need to be in final build
+RUN rm -rf yns.inlang/ vitest.config.ts tsconfig.json tailwind.config.ts
+
+
+# production image - working, but size too big?
 FROM builder AS runner
 WORKDIR /app
 

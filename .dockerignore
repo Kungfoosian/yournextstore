@@ -11,4 +11,7 @@ SECURITY*
 !.next/static
 !.next/standalone
 .git
+.gitignore
 .github
+.vscode
+.DS_Store
