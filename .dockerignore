@@ -1,17 +1,9 @@
 Dockerfile
 .dockerignore
 node_modules
-.env*
 npm-debug.log
 README.md
-CHANGELOG.md
-LICENSE*
-SECURITY*
 .next
 !.next/static
 !.next/standalone
 .git
-.gitignore
-.github
-.vscode
-.DS_Store
